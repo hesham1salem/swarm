@@ -1,0 +1,19 @@
+simple project on phase 1 :
+
+description :
+
+the robots will move from current positions  to their initial goals then after reaching their goals
+
+every robot be free will take goal from   priority queue of points and so on until finish the queue 
+
+the robot will be select for goal based on the availability nearest one  
+
+before  achieve the goal check : 
+
+ battery
+
+network area
+
+we will use behavior tree to handle this
+
+  
