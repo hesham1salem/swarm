@@ -1,26 +1,18 @@
-#include <ros/ros.h>
-#include <move_base_msgs/MoveBaseAction.h>
-#include <actionlib/client/simple_action_client.h>
-#include <queue>
-typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
+#include "multi_robot_goals.hpp"
 // Create a goal object for the move_base action
-move_base_msgs::MoveBaseGoal goal0;
-move_base_msgs::MoveBaseGoal goal1;
-move_base_msgs::MoveBaseGoal goal2;
-move_base_msgs::MoveBaseGoal other_goal, other_goal1;
 
-struct goal
+double calculateDistance(const move_base_msgs::MoveBaseGoal &goal, const geometry_msgs::PoseWithCovarianceStamped &robotPosition)
 {
-  move_base_msgs::MoveBaseGoal point;
-  int priority;
-  bool operator<(const goal &other) const
-  {
-    return this->priority < other.priority;
-  }
-};
+  double dx = goal.target_pose.pose.position.x - robotPosition.pose.pose.position.x;
+  double dy = goal.target_pose.pose.position.y - robotPosition.pose.pose.position.y;
+  return std::sqrt(dx * dx + dy * dy);
+}
 
-std::priority_queue<goal>
-    goal_queue;
+geometry_msgs::PoseWithCovarianceStamped lastOdomMsg_tb3_0, lastOdomMsg_tb3_1, lastOdomMsg_tb3_2;
+// Callback function for receiving feedback odometry  from the tb3_0/move_base
+void odomCallback_tb3_0(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg) { lastOdomMsg_tb3_0 = *msg; }
+void odomCallback_tb3_1(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg) { lastOdomMsg_tb3_1 = *msg; }
+void odomCallback_tb3_2(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg) { lastOdomMsg_tb3_2 = *msg; }
 
 int main(int argc, char **argv)
 {
@@ -32,82 +24,64 @@ int main(int argc, char **argv)
   MoveBaseClient ac0("tb3_0/move_base", true);
   MoveBaseClient ac1("tb3_1/move_base", true);
   MoveBaseClient ac2("tb3_2/move_base", true);
+  fill_goal();
 
-  // Set the frame ID of the goal
-  goal0.target_pose.header.frame_id = "map";
-  goal0.target_pose.pose.position.x = 1;
-  goal0.target_pose.pose.position.y = 2;
-  goal0.target_pose.pose.orientation.w = 1.0;
-
-  goal1.target_pose.header.frame_id = "map";
-  goal1.target_pose.pose.position.x = 2;
-  goal1.target_pose.pose.position.y = 2;
-  goal1.target_pose.pose.orientation.w = 1.0;
-
-  goal2.target_pose.header.frame_id = "map";
-  goal2.target_pose.pose.position.x = 3;
-  goal2.target_pose.pose.position.y = 3;
-  goal2.target_pose.pose.orientation.w = 1.0;
-
-  other_goal.target_pose.header.frame_id = "map";
-  other_goal.target_pose.pose.position.x = 4;
-  other_goal.target_pose.pose.position.y = 4;
-  other_goal.target_pose.pose.orientation.w = 1.0;
-
-  other_goal1.target_pose.header.frame_id = "map";
-  other_goal1.target_pose.pose.position.x = 5;
-  other_goal1.target_pose.pose.position.y = 4;
-  other_goal1.target_pose.pose.orientation.w = 1.0;
   // Wait for the move_base action server to come up
   while ((!ac0.waitForServer(ros::Duration(5.0))) && (!ac1.waitForServer(ros::Duration(5.0))) && (!ac2.waitForServer(ros::Duration(5.0))))
   {
     ROS_INFO("Waiting for the move_base action server to come up...");
   }
 
-  // Send the goal to the move_base action server
-  ac0.sendGoal(goal0);
-  ac1.sendGoal(goal1);
-  ac2.sendGoal(goal2);
-
-  // Wait for the result'
-
-  // ac0.waitForResult();
-
-  // ac1.waitForResult();
-  // ac2.waitForResult();
-
-  // Check if the goal was reached
+  ros::Subscriber sub0 = nh.subscribe("tb3_0/amcl_pose", 1, odomCallback_tb3_0);
+  ros::Subscriber sub1 = nh.subscribe("tb3_1/amcl_pose", 1, odomCallback_tb3_1);
+  ros::Subscriber sub2 = nh.subscribe("tb3_2/amcl_pose", 1, odomCallback_tb3_2);
 
   // fill the priority_queue
-  goal_queue.emplace(goal{other_goal, 1});
-  goal_queue.emplace(goal{other_goal1, 2});
 
-  while (!goal_queue.empty())
+  MoveBaseClient *selectedClient = nullptr;
+  double shortestDistance = std::numeric_limits<double>::max();
+  ros::spinOnce();
+
+  while (ros::ok() && !goal_queue.empty())
   {
+    ros::Duration(0.1).sleep();
 
-    if (ac0.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
-    {
-      ROS_INFO("tb3_0 Goal reached!");
-      ROS_INFO("send another goal ");
-      ac0.sendGoal(goal_queue.top().point);
+    ros::spinOnce();
 
-      goal_queue.pop();
-    }
-    if (ac1.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+    if (ac0.getState() != actionlib::SimpleClientGoalState::ACTIVE)
     {
-      ROS_INFO("tb3_1 Goal reached!");
-      ROS_INFO("send another goal ");
-      ac1.sendGoal(goal_queue.top().point);
-      goal_queue.pop();
+      auto current_distance = calculateDistance(goal_queue.top().point, lastOdomMsg_tb3_0);
+      if (current_distance < shortestDistance)
+      {
+        shortestDistance = current_distance;
+        selectedClient = &ac0;
+      }
     }
-    else if (ac2.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+    if (ac1.getState() != actionlib::SimpleClientGoalState::ACTIVE)
     {
-      ROS_INFO("tb3_2 Goal reached!");
-      ROS_INFO("send another goal ");
-      ac2.sendGoal(goal_queue.top().point);
+      auto current_distance = calculateDistance(goal_queue.top().point, lastOdomMsg_tb3_1);
+      if (current_distance < shortestDistance)
+      {
+        shortestDistance = current_distance;
+        selectedClient = &ac1;
+      }
+    }
+    if (ac2.getState() != actionlib::SimpleClientGoalState::ACTIVE)
+    {
+      auto current_distance = calculateDistance(goal_queue.top().point, lastOdomMsg_tb3_2);
+      if (current_distance < shortestDistance)
+      {
+        shortestDistance = current_distance;
+        selectedClient = &ac2;
+      }
+    }
+    if (selectedClient != nullptr)
+    {
+      goal goal = goal_queue.top();
+      selectedClient->sendGoal(goal.point);
       goal_queue.pop();
+      selectedClient = nullptr;
     }
   }
-
   return 0;
 }
