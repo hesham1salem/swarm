@@ -1,0 +1,9 @@
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <Sequence name="MySequence">
+      <SubscriberCondition name="MySubscriberCondition" expected_value="true"/>
+      <MoveBase name="MoveBase" />      
+       <JustDelay name="JustDelay"/>
+    </Sequence>
+  </BehaviorTree>
+</root>
