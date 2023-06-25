@@ -1,0 +1,9 @@
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <Sequence name="MySequence">
+      <SubscriberCondition name="MySubscriberCondition" expected_value="true"/>
+      <SubscriberConditionNode2 name="SecondSubscriberCondition" expected_value_2="true"/>      
+       <ApproachBin name="approach_bin"/>
+    </Sequence>
+  </BehaviorTree>
+</root>
