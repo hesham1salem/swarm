@@ -1,0 +1,5 @@
+int32 task_id
+int32 priority
+geometry_msgs/PoseStamped pose
+---
+bool success

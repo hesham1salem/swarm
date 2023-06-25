@@ -4,6 +4,7 @@
 #include <queue>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <wakeb_swarm_msgs/goal_task.h>
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 
@@ -38,4 +39,18 @@ void fill_goal()
     other_goal1.target_pose.pose.orientation.w = 1.0;
     goal_queue.emplace(goal{other_goal, 1});
     goal_queue.emplace(goal{other_goal1, 2});
+}
+
+bool myServiceCallback(wakeb_swarm_msgs::goal_task::Request &req,
+                       wakeb_swarm_msgs::goal_task::Response &res)
+{
+    // std::int32_t task_id = req.task_id;
+    goal new_goal;
+    new_goal.point.target_pose = req.pose;
+    new_goal.point.target_pose.header.frame_id ="map";
+    new_goal.priority = req.priority;
+    goal_queue.push(new_goal);
+    // std::cout << "position.x  :  " << goal_queue.top().point.target_pose.pose.position.x << std::endl;
+    res.success = true; // Populate the response field
+    return true;
 }
