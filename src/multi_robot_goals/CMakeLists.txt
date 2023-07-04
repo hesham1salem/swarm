@@ -7,13 +7,13 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib
   geometry_msgs
 )
-
+find_package(wakeb_swarm_msgs)
 catkin_package()
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${wakeb_swarm_msgs_INCLUDE_DIRS}
 )
 
 add_executable(multi_robot_goals multi_robot_goals.cpp)
-target_link_libraries(multi_robot_goals ${catkin_LIBRARIES})
-
+target_link_libraries(multi_robot_goals ${catkin_LIBRARIES} ${wakeb_swarm_msgs_libs})

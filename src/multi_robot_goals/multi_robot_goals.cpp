@@ -20,12 +20,13 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "send_goal_node");
   ros::NodeHandle nh;
 
+  ros::ServiceServer service = nh.advertiseService("assign_goal", myServiceCallback);
+
   // Create a MoveBaseClient to communicate with the move_base action server
   MoveBaseClient ac0("tb3_0/move_base", true);
   MoveBaseClient ac1("tb3_1/move_base", true);
   MoveBaseClient ac2("tb3_2/move_base", true);
   fill_goal();
-
   // Wait for the move_base action server to come up
   while ((!ac0.waitForServer(ros::Duration(5.0))) && (!ac1.waitForServer(ros::Duration(5.0))) && (!ac2.waitForServer(ros::Duration(5.0))))
   {
@@ -42,46 +43,56 @@ int main(int argc, char **argv)
   double shortestDistance = std::numeric_limits<double>::max();
   ros::spinOnce();
 
-  while (ros::ok() && !goal_queue.empty())
+  while (ros::ok())
   {
     ros::Duration(0.1).sleep();
 
     ros::spinOnce();
+    if (!goal_queue.empty())
+    {
+      if (ac0.getState() != actionlib::SimpleClientGoalState::ACTIVE)
+      {
 
-    if (ac0.getState() != actionlib::SimpleClientGoalState::ACTIVE)
-    {
-      auto current_distance = calculateDistance(goal_queue.top().point, lastOdomMsg_tb3_0);
-      if (current_distance < shortestDistance)
+        auto current_distance = calculateDistance(goal_queue.top().point, lastOdomMsg_tb3_0);
+        if (current_distance < shortestDistance)
+        {
+
+          shortestDistance = current_distance;
+          selectedClient = &ac0;
+        }
+      }
+      if (ac1.getState() != actionlib::SimpleClientGoalState::ACTIVE)
       {
-        shortestDistance = current_distance;
-        selectedClient = &ac0;
+        auto current_distance = calculateDistance(goal_queue.top().point, lastOdomMsg_tb3_1);
+        if (current_distance < shortestDistance)
+        {
+
+          shortestDistance = current_distance;
+          selectedClient = &ac1;
+        }
+      }
+      if (ac2.getState() != actionlib::SimpleClientGoalState::ACTIVE)
+      {
+        auto current_distance = calculateDistance(goal_queue.top().point, lastOdomMsg_tb3_2);
+        if (current_distance < shortestDistance)
+        {
+
+          shortestDistance = current_distance;
+          selectedClient = &ac2;
+        }
+      }
+      if (selectedClient != nullptr)
+      {
+        std::cout << "here in selectedClient" << std::endl;
+
+        goal goal = goal_queue.top();
+        selectedClient->sendGoal(goal.point);
+        goal_queue.pop();
+        selectedClient = nullptr;
+        shortestDistance = std::numeric_limits<double>::max();
       }
     }
-    if (ac1.getState() != actionlib::SimpleClientGoalState::ACTIVE)
-    {
-      auto current_distance = calculateDistance(goal_queue.top().point, lastOdomMsg_tb3_1);
-      if (current_distance < shortestDistance)
-      {
-        shortestDistance = current_distance;
-        selectedClient = &ac1;
-      }
-    }
-    if (ac2.getState() != actionlib::SimpleClientGoalState::ACTIVE)
-    {
-      auto current_distance = calculateDistance(goal_queue.top().point, lastOdomMsg_tb3_2);
-      if (current_distance < shortestDistance)
-      {
-        shortestDistance = current_distance;
-        selectedClient = &ac2;
-      }
-    }
-    if (selectedClient != nullptr)
-    {
-      goal goal = goal_queue.top();
-      selectedClient->sendGoal(goal.point);
-      goal_queue.pop();
-      selectedClient = nullptr;
-    }
+    std::cout << "position.x  :  " << goal_queue.top().point.target_pose.pose.position.x << std::endl;
   }
   return 0;
 }
