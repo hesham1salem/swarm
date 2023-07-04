@@ -3,6 +3,7 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 #include <behaviortree_cpp_v3/loggers/bt_zmq_publisher.h>
 #include "../include/BT_Nodes_Implementation/Move.h"
+
 // #include "../include/BT_Nodes_Implementation/GetGoals.h"
 // #include "../include/BT_Nodes_Implementation/ConnectRobots.h"
 
@@ -18,9 +19,10 @@ int main(int argc, char **argv)
   // Create a Behavior Tree node for the subscriber condition
   BT::BehaviorTreeFactory factory;
   factory.registerNodeType<EstablishConnection>("EstablishConnection");
-  factory.registerNodeType<GetGoals>("GetGoals");
   factory.registerNodeType<AskForHelp>("AskForHelp");
+  factory.registerNodeType<GetGoals>("GetGoals");
   factory.registerNodeType<Move>("Move");
+
 
   auto tree = factory.createTreeFromFile(xml_filename);
   BT::PublisherZMQ publisher_zmq(tree);
