@@ -59,37 +59,47 @@ public:
         if (!goal_queue.empty()){
             if (establish_connection.ac0.getState() != actionlib::SimpleClientGoalState::ACTIVE)
             {
+                std::cout<<"robot 1 status "<< establish_connection.ac0.getState().toString()<<std::endl; 
+               // ROS_INFO("robot 1 status: %d", static_cast<int>(establish_connection.ac0.getState().state_));
+                ROS_INFO_STREAM("Robot 1 status: " << establish_connection.ac1.getState().getText());
                 auto current_distance = calculateDistance(goal_queue.top().point, lastOdomMsg_tb3_0);
                 if (current_distance < shortestDistance)
                 {
                     shortestDistance = current_distance;
                     selectedClient = &establish_connection.ac0;
-                    std::cout<<"robot 1 status "<< establish_connection.ac0.getState().toString()<<std::endl; 
                     //std::cout<< "in tb3_0 "<<std::endl;
                 }
             }
+            else std::cout<<"robot 1 active "<<std::endl ; 
 
             if (establish_connection.ac1.getState() != actionlib::SimpleClientGoalState::ACTIVE)
             {
+                std::cout<<"robot 2 status "<< establish_connection.ac1.getState().toString()<<std::endl; 
+                // ROS_INFO("robot 2 status: %d", static_cast<int>(establish_connection.ac1.getState().state_));
+                ROS_INFO_STREAM("Robot 2 status: " << establish_connection.ac1.getState().getText());
+
                 auto current_distance = calculateDistance(goal_queue.top().point, lastOdomMsg_tb3_1);
                 if (current_distance < shortestDistance)
                 {
                     shortestDistance = current_distance;
                     selectedClient = &establish_connection.ac1;
-                    std::cout<<"robot 2 status "<< establish_connection.ac1.getState().toString()<<std::endl; 
                 }
             }
+            else std::cout<<"robot 2 active "<<std::endl ; 
 
             if (establish_connection.ac2.getState() != actionlib::SimpleClientGoalState::ACTIVE)
             {
+                std::cout<<"robot 3 status "<< establish_connection.ac2.getState().toString()<<std::endl; 
+                // ROS_INFO("robot 3 status: %d", static_cast<int>(establish_connection.ac2.getState().state_));
+                ROS_INFO_STREAM("Robot 3 status: " << establish_connection.ac1.getState().getText());
                 auto current_distance = calculateDistance(goal_queue.top().point, lastOdomMsg_tb3_2);
                 if (current_distance < shortestDistance)
                 {
                     shortestDistance = current_distance;
                     selectedClient = &establish_connection.ac2;
-                    std::cout<<"robot 3 status "<< establish_connection.ac2.getState().toString()<<std::endl; 
                 }
             }
+            else std::cout<<"robot 3 active "<<std::endl ; 
 
         
         if (selectedClient != nullptr){
@@ -109,10 +119,9 @@ public:
             // std::cout << selectedClient->getState().state_ <<std::endl ;
             // }
         }    
-        else break ;
     }         
         }
-        return BT::NodeStatus::FAILURE;
+        return BT::NodeStatus::SUCCESS;
         }};
 
 

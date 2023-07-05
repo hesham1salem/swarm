@@ -28,20 +28,26 @@ public:
     other_goal1.target_pose.pose.orientation.w = 1.0;
 
     other_goal2.target_pose.header.frame_id = "map";
-    other_goal2.target_pose.pose.position.x = 0.5;
+    other_goal2.target_pose.pose.position.x = -2;
     other_goal2.target_pose.pose.position.y = 0.5;
     other_goal2.target_pose.pose.orientation.w = 1.0;
-
 
     other_goal3.target_pose.header.frame_id = "map";
     other_goal3.target_pose.pose.position.x = 4;
     other_goal3.target_pose.pose.position.y = 0.5;
     other_goal3.target_pose.pose.orientation.w = 1.0;
 
-    goal_queue.emplace(goal{other_goal, 1});
+    other_goal4.target_pose.header.frame_id = "map";
+    other_goal4.target_pose.pose.position.x = 4;
+    other_goal4.target_pose.pose.position.y = 1.5;
+    other_goal4.target_pose.pose.orientation.w = 1.0;
+
+    goal_queue.emplace(goal{other_goal, 3});
     goal_queue.emplace(goal{other_goal1, 2});
-    goal_queue.emplace(goal{other_goal2, 3});
+    goal_queue.emplace(goal{other_goal2, 1});
     goal_queue.emplace(goal{other_goal3, 4});
+    goal_queue.emplace(goal{other_goal4, 4});
+
 
     flag = false;
     // std::cout<< "y of top point " <<goal_queue.top().point.target_pose.pose.position.y<<std::endl;

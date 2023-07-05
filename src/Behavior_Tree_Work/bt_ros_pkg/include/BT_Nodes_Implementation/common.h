@@ -5,7 +5,7 @@
 #include <move_base_msgs/MoveBaseAction.h>
 
 // GetGoals Definitions 
- move_base_msgs::MoveBaseGoal goal0,goal1,goal2,other_goal,other_goal1,other_goal2,other_goal3;
+ move_base_msgs::MoveBaseGoal goal0,goal1,goal2,other_goal,other_goal1,other_goal2,other_goal3, other_goal4;
   struct goal
   {
     move_base_msgs::MoveBaseGoal point;
