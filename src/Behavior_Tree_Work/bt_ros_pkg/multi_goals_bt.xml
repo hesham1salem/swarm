@@ -1,13 +1,14 @@
 <root main_tree_to_execute="MainTree">
   <BehaviorTree ID="MainTree">
-    <Sequence name="MySequence">
+  <Sequence name ="main">
       <Fallback name = "connection fallback ">      
         <EstablishConnection name="EstablishConnection" />
         <AskForHelp name="AskForHelp" />
       </Fallback>
-       <!-- <MoveRobots name="MoveRobots"/> -->
-      <GetGoals name="GetGoals" />
-      <Move name= "Move" />
+      <!-- <GetGoals name="GetGoals" /> -->
+     <Sequence name="MySequence">
+        <Move name= "Move" />
     </Sequence>
+  </Sequence>
   </BehaviorTree>
 </root>

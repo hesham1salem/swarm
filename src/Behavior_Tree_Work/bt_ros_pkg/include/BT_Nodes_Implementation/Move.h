@@ -15,6 +15,8 @@ private:
     ros::Subscriber sub2;
       // Reset this flag
     bool _aborted = false;
+    EstablishConnection establish_connection;
+
 
 public:
     Move(const std::string& name, const BT::NodeConfiguration& config)
@@ -22,7 +24,9 @@ public:
           nh(),
           sub0(nh.subscribe("tb3_0/amcl_pose", 1, &Move::odomCallback_tb3_0, this)),
           sub1(nh.subscribe("tb3_1/amcl_pose", 1, &Move::odomCallback_tb3_1, this)),
-          sub2(nh.subscribe("tb3_2/amcl_pose", 1, &Move::odomCallback_tb3_2, this))
+          sub2(nh.subscribe("tb3_2/amcl_pose", 1, &Move::odomCallback_tb3_2, this)),
+          establish_connection("establish_connection", {})
+
     {
     }
 
@@ -51,9 +55,8 @@ public:
     {
         ros::spinOnce();
         MoveBaseClient* selectedClient = nullptr;
-        EstablishConnection establish_connection("establish_connection", {});
 
-        while(ros::ok() ){
+        // while(ros::ok() ){
         ros::Duration(1).sleep();
         ros::spinOnce();
         if (!goal_queue.empty()){
@@ -117,10 +120,12 @@ public:
             // if (selectedClient->getState() != actionlib::SimpleClientGoalState::SUCCEEDED) {
             // ROS_ERROR("MoveBase failed");
             // std::cout << selectedClient->getState().state_ <<std::endl ;
-            // }
+            // }        
+            return BT::NodeStatus::SUCCESS;
+
         }    
     }         
-        }
+        
         return BT::NodeStatus::SUCCESS;
         }};
 

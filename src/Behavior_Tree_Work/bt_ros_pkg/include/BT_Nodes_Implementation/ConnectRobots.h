@@ -26,7 +26,7 @@ bool ConnectOnce = true;
   BT::NodeStatus tick() override
   {
     // Wait for the move_base action server to come up
-    if (ConnectOnce){
+    // if (ConnectOnce){
 
     if  ((!ac0.waitForServer(ros::Duration(5.0))) && (!ac1.waitForServer(ros::Duration(5.0))) && (!ac2.waitForServer(ros::Duration(5.0))))
     {
@@ -34,9 +34,8 @@ bool ConnectOnce = true;
       return BT::NodeStatus::FAILURE;
     }
     else  return BT::NodeStatus::SUCCESS;
-    ConnectOnce = false;
-    }
-    return BT::NodeStatus::SUCCESS;
+    // ConnectOnce = false;
+    // }
     }
 
 };
