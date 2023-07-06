@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
 
   ros::NodeHandle nh("~");
   std::string xml_filename;
-  nh.param<std::string>("file", xml_filename, "/home/wafaa/swarm/src/Behavior_Tree_Work/bt_ros_pkg/multi_bt.xml");
+  nh.param<std::string>("file", xml_filename, "/home/wafaa/swarm/src/Behavior_Tree_Work/BT_ros1/BT_sample/cfg/multi_bt.xml");
   ROS_INFO("Loading XML : %s", xml_filename.c_str());
 
   // We use the BehaviorTreeFactory to register our custom nodes

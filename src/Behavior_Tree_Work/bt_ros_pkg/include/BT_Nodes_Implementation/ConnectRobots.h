@@ -12,9 +12,11 @@ public:
       ac0("tb3_0/move_base", true),
       ac1("tb3_1/move_base", true),
       ac2("tb3_2/move_base", true)
-  {} 
-MoveBaseClient ac0 , ac1, ac2  ; 
+  {
 
+  } 
+MoveBaseClient ac0 , ac1, ac2  ; 
+bool ConnectOnce = true;
   static BT::PortsList providedPorts()
   {
     return {};
@@ -24,16 +26,17 @@ MoveBaseClient ac0 , ac1, ac2  ;
   BT::NodeStatus tick() override
   {
     // Wait for the move_base action server to come up
- 
+    // if (ConnectOnce){
 
     if  ((!ac0.waitForServer(ros::Duration(5.0))) && (!ac1.waitForServer(ros::Duration(5.0))) && (!ac2.waitForServer(ros::Duration(5.0))))
     {
       ROS_INFO("Waiting for the move_base action server to come up...");
       return BT::NodeStatus::FAILURE;
     }
-    else {
-          ROS_INFO("Connection is done...");
-          return BT::NodeStatus::SUCCESS;}}
+    else  return BT::NodeStatus::SUCCESS;
+    // ConnectOnce = false;
+    // }
+    }
 
 };
 

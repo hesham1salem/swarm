@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib
   actionlib_msgs
   std_msgs
+  wakeb_swarm_msgs
 )
 
 catkin_package()
