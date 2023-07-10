@@ -1,4 +1,4 @@
-module client
+module web_interface
 
 go 1.20
 
