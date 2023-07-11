@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Send Task goal </title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+  
+    $(document).ready(function() {
+      $('#sendButton').click(function() {
+        var jsonData = {
+          "task_id": parseInt($('#taskId').val()),
+          "priority": parseInt($('#priority').val()),
+          "pose": {
+            "pose": {
+              "position": {
+                "x": parseFloat($('#positionX').val()),
+                "y": parseFloat($('#positionY').val()),
+                "z": parseFloat($('#positionZ').val())
+              },
+              "orientation": {
+                "x": parseFloat($('#orientationX').val()),
+                "y": parseFloat($('#orientationY').val()),
+                "z": parseFloat($('#orientationZ').val()),
+                "w": parseFloat($('#orientationW').val())
+              }
+            }
+          }
+        };
+
+  axios.post('http://localhost:8080/api/tasks', JSON.stringify(jsonData))
+      });
+    });
+  </script>
+</head>
+<body>
+  <h2>Send Task goal</h2>
+  <form>
+    <label for="taskId">Task ID:</label><br>
+    <input type="text" id="taskId" name="taskId" value="123"><br><br>
+
+    <label for="priority">Priority:</label><br>
+    <input type="text" id="priority" name="priority" value="5"><br><br>
+
+    <label for="positionX">Position X:</label><br>
+    <input type="text" id="positionX" name="positionX" value="4.0"><br><br>
+
+    <label for="positionY">Position Y:</label><br>
+    <input type="text" id="positionY" name="positionY" value="5.0"><br><br>
+
+    <label for="positionZ">Position Z:</label><br>
+    <input type="text" id="positionZ" name="positionZ" value="0.0"><br><br>
+
+    <label for="orientationX">Orientation X:</label><br>
+    <input type="text" id="orientationX" name="orientationX" value="0.0"><br><br>
+
+    <label for="orientationY">Orientation Y:</label><br>
+    <input type="text" id="orientationY" name="orientationY" value="0.0"><br><br>
+
+    <label for="orientationZ">Orientation Z:</label><br>
+    <input type="text" id="orientationZ" name="orientationZ" value="0.0"><br><br>
+
+    <label for="orientationW">Orientation W:</label><br>
+    <input type="text" id="orientationW" name="orientationW" value="1.0"><br><br>
+
+    <input type="button" id="sendButton" value="Send">
+  </form>
+</body>
+</html>

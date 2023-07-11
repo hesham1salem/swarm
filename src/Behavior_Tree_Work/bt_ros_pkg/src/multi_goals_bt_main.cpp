@@ -3,6 +3,7 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 #include <behaviortree_cpp_v3/loggers/bt_zmq_publisher.h>
 #include "../include/BT_Nodes_Implementation/Move.h"
+#include "../include/BT_Nodes_Implementation/send_task_status.h"
 #include "wakeb_swarm_msgs/goal_task.h"
 
 
@@ -15,6 +16,7 @@ bool myServiceCallback(wakeb_swarm_msgs::goal_task::Request &req,
     new_goal.point.target_pose = req.pose;
     new_goal.point.target_pose.header.frame_id ="map";
     new_goal.priority = req.priority;
+    new_goal.task_id = req.task_id;
     goal_queue.push(new_goal);
     res.success = true; // Populate the response field
     return true;
@@ -24,6 +26,7 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "multi_goals_bt");
   ros::NodeHandle nh;
+  ros::ServiceServer task_status_server;
   std::string xml_filename;
   nh.param<std::string>("file", xml_filename, "/home/wafaa/swarm/src/Behavior_Tree_Work/bt_ros_pkg/multi_goals_bt.xml");
   ros::ServiceServer service = nh.advertiseService("assign_goal", myServiceCallback);
@@ -33,10 +36,9 @@ int main(int argc, char **argv)
   factory.registerNodeType<EstablishConnection>("EstablishConnection");
   factory.registerNodeType<AskForHelp>("AskForHelp");
   // factory.registerNodeType<GetGoals>("GetGoals");
+  // factory.registerNodeType<SendTaskStatus>("SendTaskStatus");
   factory.registerNodeType<Move>("Move");
   
-
-
   auto tree = factory.createTreeFromFile(xml_filename);
   BT::PublisherZMQ publisher_zmq(tree);
   // Run the Behavior Tree

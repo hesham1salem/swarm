@@ -60,6 +60,7 @@ geometry_msgs
  add_service_files(
    FILES
    goal_task.srv
+   task_status.srv
 
  )
 

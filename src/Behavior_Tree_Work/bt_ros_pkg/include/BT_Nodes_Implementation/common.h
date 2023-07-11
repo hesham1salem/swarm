@@ -10,6 +10,7 @@
   {
     move_base_msgs::MoveBaseGoal point;
     int priority;
+    int task_id;
 
     bool operator<(const goal &other) const
     {

@@ -6,9 +6,8 @@
         <AskForHelp name="AskForHelp" />
       </Fallback>
       <!-- <GetGoals name="GetGoals" /> -->
-     <Sequence name="MySequence">
-        <Move name= "Move" />
-    </Sequence>
+      <!-- <SendTaskStatus name = "SendTaskStatus"/> -->
+      <Move name= "Move" />
   </Sequence>
   </BehaviorTree>
 </root>

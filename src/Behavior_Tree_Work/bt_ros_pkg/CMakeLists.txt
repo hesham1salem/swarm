@@ -26,3 +26,6 @@ target_link_libraries(move_base_with_bt ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 add_executable(multi_goals_bt src/multi_goals_bt.cpp src/multi_goals_bt_main.cpp )
 target_link_libraries(multi_goals_bt ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(service_client src/test_node.cpp  )
+target_link_libraries(service_client ${catkin_LIBRARIES} ${Boost_LIBRARIES})
